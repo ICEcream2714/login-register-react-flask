@@ -1,26 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './styles.css';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login:', { username, password });
+    setErrorMessage(''); // Reset error message
+
+    if (!username || !password) {
+      setErrorMessage('All fields are required');
+      return;
+    }
 
     try {
-      const response = await axios.post('http://localhost:5000/login', { username, password });
+      const response = await axios.post('http://localhost:5000/login', {
+        username,
+        password,
+      });
       if (response.status === 200) {
         navigate('/users'); // Điều hướng tới trang UserList sau khi đăng nhập thành công
       } else {
-        alert('Invalid credentials');
+        setErrorMessage('Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('An error occurred during login');
+      setErrorMessage('Check your username and password and try again');
     }
   };
 
@@ -39,6 +49,10 @@ const Login = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      {errorMessage && 
+      <p style={{ color: 'red' }}>
+        {errorMessage}
+        </p>}
       <button type="submit" disabled={!username || !password}>
         Login
       </button>

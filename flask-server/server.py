@@ -18,6 +18,15 @@ class User(db.Model):
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
+    username_exists = User.query.filter_by(username=data['username']).first()
+    email_exists = User.query.filter_by(email=data['email']).first()
+    
+    if username_exists:
+        return jsonify({"message": "Username already exists!"}), 400
+    
+    if email_exists:
+        return jsonify({"message": "Email already exists!"}), 400
+    
     new_user = User(username=data['username'], email=data['email'], password=data['password'])
     db.session.add(new_user)
     db.session.commit()
@@ -29,7 +38,7 @@ def login():
     user = User.query.filter_by(username=data['username'], password=data['password']).first()
     if user:
         return jsonify({"message": "Login successful"}), 200
-    return jsonify({"message": "Invalid credentials"}), 401
+    return jsonify({"message": "Invalid credentials, please try again"}), 401
 
 @app.route('/users', methods=['GET'])
 def get_users():
