@@ -7,6 +7,7 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ const Register = () => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!username || !email || !password) {
+    if (!username || !email || !password || !confirmPassword) {
       setErrorMessage('All fields are required');
       return;
     }
@@ -29,10 +30,15 @@ const Register = () => {
       return;
     }
 
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match');
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/register', { username, email, password });
       if (response.status === 201) {
-        alert("Register successfull, navigate to Login")
+        alert("Register successful, navigate to Login")
         navigate('/login'); // Điều hướng tới trang đăng nhập sau khi đăng ký thành công
       } else if (response.data.message) {
         setErrorMessage(response.data.message);
@@ -66,8 +72,14 @@ const Register = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+      />
       {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-      <button type="submit" disabled={!username || !email || !password}>
+      <button type="submit" disabled={!username || !email || !password || !confirmPassword}>
         Register
       </button>
       <p>
