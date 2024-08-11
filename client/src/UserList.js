@@ -10,14 +10,25 @@ const UserList = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/users');
+        const token = localStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
+        const response = await axios.get('http://localhost:5000/users', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setUsers(response.data);
       } catch (error) {
         console.error('Error fetching users:', error);
+        if (error.response && error.response.status === 401) {
+          navigate('/login');
+        }
       }
     };
     fetchUsers();
-  }, []);
+  }, [navigate]);
+  
 
   const handleLogout = () => {
     // Xử lý đăng xuất (xóa token hoặc thông tin đăng nhập)

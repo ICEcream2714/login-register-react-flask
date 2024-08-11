@@ -24,6 +24,7 @@ const Login = () => {
         password,
       });
       if (response.status === 200) {
+        localStorage.setItem('token', response.data.token);
         navigate('/users'); // Điều hướng tới trang UserList sau khi đăng nhập thành công
       } else {
         setErrorMessage('Invalid credentials');
